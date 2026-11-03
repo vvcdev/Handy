@@ -16,7 +16,7 @@ logged in. If Claude fails, Handy pastes the raw transcript as it always does.
 ./scripts/update-fork.sh
 ```
 Merges `upstream/main`, checks the Claude hooks survived, builds, signs with a stable local
-certificate ("Handy Fork Local", so macOS permissions are kept), quits Handy, installs to
+certificate ("Handy Fork Local", kept in `~/Library/Keychains/handyfork.keychain-db`, so macOS permissions are kept), quits Handy, installs to
 `/Applications` and relaunches. The previous app is kept at `~/Desktop/Handy-previous.app`.
 On a merge conflict it aborts without changing anything.
 

@@ -34,6 +34,9 @@ for f in src-tauri/src/actions.rs src-tauri/src/settings.rs src-tauri/src/lib.rs
   grep -q "claude_code\|ClaudeTranscribe" "$f" || { echo "Claude hook missing from $f after merge"; exit 1; }
 done
 
+# Dedicated keychain holding the throwaway local signing cert (no real secret).
+KC="$HOME/Library/Keychains/handyfork.keychain-db"
+security unlock-keychain -p handyfork "$KC" 2>/dev/null || true
 security find-identity -p codesigning | grep -q "$IDENTITY" || { echo "Signing cert '$IDENTITY' not found in your keychain."; exit 1; }
 
 bun install
