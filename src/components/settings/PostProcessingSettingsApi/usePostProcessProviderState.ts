@@ -15,6 +15,7 @@ type PostProcessProviderState = {
   isCustomProvider: boolean;
   isAppleProvider: boolean;
   appleIntelligenceUnavailable: boolean;
+  isClaudeCodeProvider: boolean;
   baseUrl: string;
   handleBaseUrlChange: (value: string) => void;
   isBaseUrlUpdating: boolean;
@@ -36,6 +37,7 @@ type PostProcessProviderState = {
 };
 
 const APPLE_PROVIDER_ID = "apple_intelligence";
+const CLAUDE_CODE_PROVIDER_ID = "claude_code"; // fork-only
 
 export const usePostProcessProviderState = (): PostProcessProviderState => {
   const {
@@ -65,6 +67,7 @@ export const usePostProcessProviderState = (): PostProcessProviderState => {
   }, [providers, selectedProviderId]);
 
   const isAppleProvider = selectedProvider?.id === APPLE_PROVIDER_ID;
+  const isClaudeCodeProvider = selectedProvider?.id === CLAUDE_CODE_PROVIDER_ID;
   const [appleIntelligenceUnavailable, setAppleIntelligenceUnavailable] =
     useState(false);
 
@@ -111,7 +114,10 @@ export const usePostProcessProviderState = (): PostProcessProviderState => {
         const hasBaseUrl = (provider?.base_url ?? "").trim() !== "";
         const hasApiKey = apiKey.trim() !== "";
 
-        if (provider?.id === "custom" ? hasBaseUrl : hasApiKey) {
+        if (
+          providerId === CLAUDE_CODE_PROVIDER_ID ||
+          (provider?.id === "custom" ? hasBaseUrl : hasApiKey)
+        ) {
           void fetchPostProcessModels(providerId);
         }
       }
@@ -237,6 +243,7 @@ export const usePostProcessProviderState = (): PostProcessProviderState => {
     isCustomProvider,
     isAppleProvider,
     appleIntelligenceUnavailable,
+    isClaudeCodeProvider,
     baseUrl,
     handleBaseUrlChange,
     isBaseUrlUpdating,

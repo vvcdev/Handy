@@ -255,6 +255,20 @@ async fn post_process_transcription(
         provider.id, model
     );
 
+    // Fork-only: Claude Code CLI provider (see claude_code.rs)
+    if provider.id == crate::claude_code::PROVIDER_ID {
+        return match crate::claude_code::post_process(
+            &build_system_prompt(&prompt),
+            &model,
+            transcription,
+        )
+        .await
+        {
+            Some(text) => PostProcessOutcome::Done(strip_invisible_chars(strip_think_block(&text))),
+            None => PostProcessOutcome::Failed,
+        };
+    }
+
     let api_key = settings
         .post_process_api_keys
         .get(&provider.id)

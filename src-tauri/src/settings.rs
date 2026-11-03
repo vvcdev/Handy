@@ -794,6 +794,17 @@ fn default_post_process_providers() -> Vec<PostProcessProvider> {
         });
     }
 
+    // Fork-only: polish with the local Claude Code CLI (uses the Claude subscription)
+    providers.push(PostProcessProvider {
+        id: crate::claude_code::PROVIDER_ID.to_string(),
+        label: "Claude Code".to_string(),
+        base_url: "claude-code://local".to_string(),
+        allow_base_url_edit: false,
+        models_endpoint: None,
+        supports_structured_output: false,
+        api_format: PostProcessApiFormat::OpenAi,
+    });
+
     // AWS Bedrock via Mantle (OpenAI-compatible endpoint)
     providers.push(PostProcessProvider {
         id: "bedrock_mantle".to_string(),
@@ -830,6 +841,9 @@ fn default_post_process_api_keys() -> SecretMap {
 fn default_model_for_provider(provider_id: &str) -> String {
     if provider_id == APPLE_INTELLIGENCE_PROVIDER_ID {
         return APPLE_INTELLIGENCE_DEFAULT_MODEL_ID.to_string();
+    }
+    if provider_id == crate::claude_code::PROVIDER_ID {
+        return crate::claude_code::DEFAULT_MODEL.to_string();
     }
     String::new()
 }

@@ -1335,6 +1335,13 @@ pub async fn fetch_post_process_models(
         .find(|p| p.id == provider_id)
         .ok_or_else(|| format!("Provider '{}' not found", provider_id))?;
 
+    if provider.id == crate::claude_code::PROVIDER_ID {
+        return Ok(crate::claude_code::MODEL_ALIASES
+            .iter()
+            .map(|m| m.to_string())
+            .collect());
+    }
+
     if provider.id == APPLE_INTELLIGENCE_PROVIDER_ID {
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         {
