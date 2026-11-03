@@ -4,32 +4,16 @@ import React, { useEffect, useState } from "react";
 import { commands } from "@/bindings";
 import { Alert } from "../../ui/Alert";
 import { Button } from "../../ui/Button";
-import {
-  Dropdown,
-  SettingContainer,
-  SettingsGroup,
-  Textarea,
-  ToggleSwitch,
-} from "@/components/ui";
+import { SettingsGroup, Textarea, ToggleSwitch } from "@/components/ui";
 import { ShortcutInput } from "../ShortcutInput";
 import { PostProcessingSettingsPrompts } from "../post-processing/PostProcessingSettings";
 import { useSettings } from "../../../hooks/useSettings";
 
 const PROVIDER_ID = "claude_code";
-const MODELS = [
-  { value: "haiku", label: "Haiku (fastest)" },
-  { value: "sonnet", label: "Sonnet (balanced)" },
-  { value: "opus", label: "Opus (best, slowest)" },
-];
 
 export const ClaudeTranscribeSettings: React.FC = () => {
-  const {
-    settings,
-    updateSetting,
-    setPostProcessProvider,
-    updatePostProcessModel,
-    isUpdating,
-  } = useSettings();
+  const { settings, updateSetting, setPostProcessProvider, isUpdating } =
+    useSettings();
   const [cliFound, setCliFound] = useState<boolean | null>(null);
   const [sample, setSample] = useState(
     "um so like i was thinking we should uh meet tomorrow at three no wait four pm to discuss the the budget",
@@ -45,7 +29,6 @@ export const ClaudeTranscribeSettings: React.FC = () => {
   const active =
     !!settings?.post_process_enabled &&
     settings?.post_process_provider_id === PROVIDER_ID;
-  const model = settings?.post_process_models?.[PROVIDER_ID] || "haiku";
 
   const toggle = async (on: boolean) => {
     if (on) {
@@ -88,7 +71,7 @@ export const ClaudeTranscribeSettings: React.FC = () => {
             isUpdating("post_process_provider_id")
           }
           label="Polish dictation with Claude"
-          description="Cleans up your transcript with Claude Code (your Claude subscription) before it's pasted. Use the shortcut below. If Claude fails, the raw transcript is pasted instead."
+          description="Cleans up your transcript with Claude Haiku at the lowest effort, via Claude Code (your Claude subscription) before it's pasted. Use the shortcut below. If Claude fails, the raw transcript is pasted instead."
           descriptionMode="inline"
           grouped={true}
         />
@@ -97,19 +80,6 @@ export const ClaudeTranscribeSettings: React.FC = () => {
           descriptionMode="tooltip"
           grouped={true}
         />
-        <SettingContainer
-          title="Model"
-          description="Haiku is fastest (about 2 seconds). Sonnet and Opus are slower but follow complicated prompts better."
-          descriptionMode="tooltip"
-          layout="horizontal"
-          grouped={true}
-        >
-          <Dropdown
-            options={MODELS}
-            selectedValue={model}
-            onSelect={(v) => void updatePostProcessModel(PROVIDER_ID, v)}
-          />
-        </SettingContainer>
       </SettingsGroup>
 
       <SettingsGroup title="Prompt">

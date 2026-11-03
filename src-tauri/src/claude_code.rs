@@ -15,8 +15,9 @@ use tokio::process::Command;
 
 pub const PROVIDER_ID: &str = "claude_code";
 pub const DEFAULT_MODEL: &str = "haiku";
-/// Aliases understood by `claude --model`; offered in the model dropdown.
-pub const MODEL_ALIASES: [&str; 3] = ["haiku", "sonnet", "opus"];
+/// Haiku is the only model this fork uses (fastest). Whatever model string is
+/// stored in settings is ignored.
+pub const MODEL_ALIASES: [&str; 1] = ["haiku"];
 
 const TIMEOUT: Duration = Duration::from_secs(45);
 
@@ -68,10 +69,8 @@ pub async fn post_process(system_prompt: &str, model: &str, transcription: &str)
             return None;
         }
     };
-    let model = match model.trim() {
-        "" => DEFAULT_MODEL,
-        m => m,
-    };
+    let _ = model; // locked to Haiku, see MODEL_ALIASES
+    let model = DEFAULT_MODEL;
 
     // Isolation flags keep this fast and side-effect free: no tools, no MCP
     // servers, no skills, no user/project hooks or settings, nothing persisted.
@@ -79,6 +78,9 @@ pub async fn post_process(system_prompt: &str, model: &str, transcription: &str)
         .args(["-p", "--model", model])
         .args(["--system-prompt", &format!("{system_prompt}{GUARD}")])
         .args(["--tools", ""])
+        // Lowest reasoning effort the CLI offers, and no extended-thinking budget.
+        .args(["--effort", "low"])
+        .env("MAX_THINKING_TOKENS", "0")
         .args(["--disable-slash-commands", "--strict-mcp-config"])
         .args(["--setting-sources", ""])
         .arg("--no-session-persistence")
