@@ -650,6 +650,14 @@ async checkAppleIntelligenceAvailable() : Promise<boolean> {
 async checkClaudeCodeAvailable() : Promise<boolean> {
     return await TAURI_INVOKE("check_claude_code_available");
 },
+async testClaudePolish(text: string) : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("test_claude_polish", { text }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 /**
  * Try to initialize Enigo (keyboard/mouse simulation).
  * On macOS, this will return an error if accessibility permissions are not granted.

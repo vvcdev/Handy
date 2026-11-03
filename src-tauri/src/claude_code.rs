@@ -155,3 +155,25 @@ mod tests {
         assert!(!out.contains("paris"), "model answered instead of cleaning");
     }
 }
+
+/// Runs the currently selected Handy prompt on `text` through Claude Code, for
+/// the "Try it" box in the Claude Transcribe tab.
+#[specta::specta]
+#[tauri::command]
+pub async fn test_claude_polish(app: tauri::AppHandle, text: String) -> Result<String, String> {
+    let settings = crate::settings::get_settings(&app);
+    let prompt = settings
+        .post_process_selected_prompt_id
+        .as_ref()
+        .and_then(|id| settings.post_process_prompts.iter().find(|p| &p.id == id))
+        .map(|p| p.prompt.replace("${output}", "").trim().to_string())
+        .ok_or_else(|| "No prompt is selected.".to_string())?;
+    let model = settings
+        .post_process_models
+        .get(PROVIDER_ID)
+        .cloned()
+        .unwrap_or_default();
+    post_process(&prompt, &model, &text).await.ok_or_else(|| {
+        "Claude Code didn't return a result. Is it installed and logged in?".to_string()
+    })
+}

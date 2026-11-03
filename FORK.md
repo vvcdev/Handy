@@ -6,25 +6,27 @@ which polishes dictation using your local `claude` CLI (your Claude
 subscription, no API key).
 
 ## Using it
-Settings → Post Processing → Provider → **Claude Code**. Pick a model alias
-(`haiku` is fastest, ~2s). Use the "transcribe with post-processing" shortcut.
-Requires Claude Code installed and logged in. If it fails, Handy pastes the raw transcript
-as it always does.
+Open the **Claude Transcribe** tab in the sidebar: turn on "Polish dictation with Claude",
+pick a model (`haiku` is fastest, ~2s), edit the prompt, and test it in the "Try it" box.
+Dictate with the post-processing shortcut shown there. Requires Claude Code installed and
+logged in. If Claude fails, Handy pastes the raw transcript as it always does.
+
+## Updating (latest Handy + Claude)
+```bash
+./scripts/update-fork.sh
+```
+Merges `upstream/main`, checks the Claude hooks survived, builds, signs with a stable local
+certificate ("Handy Fork Local", so macOS permissions are kept), quits Handy, installs to
+`/Applications` and relaunches. The previous app is kept at `~/Desktop/Handy-previous.app`.
+On a merge conflict it aborts without changing anything.
+
+The in-app updater is pointed at this fork's releases (none exist) so it can never replace
+the app with vanilla Handy. Use the script instead.
 
 ## Fork-only footprint (everything to re-check after an upstream merge)
-- `src-tauri/src/claude_code.rs` — the whole feature (new file, never conflicts)
-- one-line/small hooks, all grep-able with `claude_code`:
+- New files, never conflict: `src-tauri/src/claude_code.rs`,
+  `src/components/settings/claude-transcribe/`, `scripts/update-fork.sh`, `FORK.md`
+- Small hooks, all grep-able with `claude_code` / `ClaudeTranscribe`:
   `lib.rs`, `settings.rs`, `actions.rs`, `shortcut/mod.rs`, `commands/mod.rs`,
-  `src/bindings.ts`, `usePostProcessProviderState.ts`, `PostProcessingSettings.tsx`
-
-## Pulling in upstream updates
-```bash
-git checkout claude-code-polisher
-git fetch upstream
-git merge upstream/main
-bun install && bun run tauri build --bundles app
-```
-The fork work is a single small commit on the `claude-code-polisher` branch. If a
-merge conflicts it will be in one of the hook files above and is trivial to resolve.
-If `src/bindings.ts` conflicts, take upstream's and re-add `checkClaudeCodeAvailable`
-(or run `bun run tauri dev` once; it regenerates the bindings).
+  `src/bindings.ts`, `Sidebar.tsx`, `usePostProcessProviderState.ts`,
+  `PostProcessingSettings.tsx`, and the updater endpoint in `tauri.conf.json`

@@ -765,6 +765,7 @@ pub fn run(cli_args: CliArgs) {
             commands::open_app_data_dir,
             commands::check_apple_intelligence_available,
             commands::check_claude_code_available,
+            claude_code::test_claude_polish,
             commands::initialize_enigo,
             commands::initialize_shortcuts,
             commands::complete_onboarding,
