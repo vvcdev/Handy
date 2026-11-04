@@ -524,6 +524,10 @@ impl ShortcutAction for TranscribeAction {
             }
         }
 
+        if self.post_process {
+            crate::claude_code::prewarm(app); // fork-only: start Claude while recording
+        }
+
         let binding_id = binding_id.to_string();
         RECORDING_SESSION.fetch_add(1, Ordering::SeqCst);
         let tray_started = Instant::now();
